@@ -19,15 +19,20 @@ class GoodsViewModel : ViewModel() {
         get() = _state
 
     init {
+        loadGoodsFromDatabase()
+    }
+
+    private fun loadGoodsFromDatabase() {
         val goodsFromDb = db
             ?.goodsDao()
             ?.getAllGoods()
             ?.map { good ->
                 GoodsItem(
+                    id = good.id,
                     name = good.name,
                     rating = good.rating,
                     description = good.description,
-                    imageURL = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSibbxABu10t0qxQWHjH-QQFSWaCgd68RbztA&s"
+                    imageURL = good.imageUrl
                 )
             } ?: emptyList()
 
@@ -38,26 +43,33 @@ class GoodsViewModel : ViewModel() {
         }
     }
 
-    fun addGood(name: String, description: String) {
+    fun addGood(name: String, description: String, imageUrl: String = "") {
         val goodsList = state.value.items.toMutableList()
         goodsList.add(
             GoodsItem(
                 name = name,
                 rating = 5,
                 description = description,
-                imageURL = ""
+                imageURL = imageUrl
             )
         )
         db?.goodsDao()?.insert(
             Good(
                 name = name,
                 description = description,
-                rating = 5
+                rating = 5,
+                imageUrl = imageUrl
             )
         )
         _state.value = GoodsUiState(goodsList)
     }
 
+    fun deleteGood(goodId: Long) {
+        db?.goodsDao()?.deleteById(goodId)
+        
+        val goodsList = state.value.items.filterNot { it.id == goodId }
+        _state.value = GoodsUiState(goodsList)
+    }
 
     companion object {
 
