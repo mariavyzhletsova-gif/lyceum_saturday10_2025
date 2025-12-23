@@ -1,87 +1,104 @@
-package com.example.lyceum_saturday10_2025.features.goods.presentation.components
+package com.example.lyceum_saturday10_2025.features.goods.presentation.screen
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
+import com.example.lyceum_saturday10_2025.features.goods.presentation.components.GoodsCard
+import com.example.lyceum_saturday10_2025.features.goods.presentation.contract.GoodsUiState
 import com.example.lyceum_saturday10_2025.features.goods.presentation.model.GoodsItem
 
-
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun GoodsCard(
-    goodsItem: GoodsItem,
+fun GoodsScreenContent(
+    state: GoodsUiState,
+    onAddClicked: (String, String, String) -> Unit,
     onGoodClicked: (GoodsItem) -> Unit,
+    onDeleteGood: (Long) -> Unit,
 ) {
-    Card(
-        onClick = {
-            onGoodClicked(goodsItem)
-        }
-    ) {
-        Column {
-            //Локальная картинка
-//            Image(
-//                modifier = Modifier.fillMaxWidth(),
-//                painter = painterResource(R.drawable.kotlin),
-//                contentDescription = null,
-//                contentScale = ContentScale.Crop
-//            )
-            //Загрузка картинки из интернета
-            GlideImage(
-                model = goodsItem.imageURL,
-                contentScale = ContentScale.FillWidth,
-                contentDescription = null,
-            )
-
-            Row(
-                modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(goodsItem.name)
-
-                Spacer(Modifier.weight(1f))
-
-                for (i in 0..4) {
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = null,
-                        tint = if (i < goodsItem.rating) Color.Yellow else Color.Gray
-                    )
-                }
+    Column {
+        var nameTextFieldValue by remember { mutableStateOf("") }
+        OutlinedTextField(
+            value = nameTextFieldValue,
+            onValueChange = { newValue ->
+                nameTextFieldValue = newValue
+            },
+            placeholder = {
+                Text("Введите название")
             }
-            Text(
-                modifier = Modifier.padding(16.dp),
-                text = goodsItem.description
-            )
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        var descriptionTextFieldValue by remember { mutableStateOf("") }
+        OutlinedTextField(
+            value = descriptionTextFieldValue,
+            onValueChange = { newValue ->
+                descriptionTextFieldValue = newValue
+            },
+            placeholder = {
+                Text("Введите описание")
+            }
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        var imageUrlTextFieldValue by remember { mutableStateOf("") }
+        OutlinedTextField(
+            value = imageUrlTextFieldValue,
+            onValueChange = { newValue ->
+                imageUrlTextFieldValue = newValue
+            },
+            placeholder = {
+                Text("URL картинки")
+            }
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        Button(onClick = {
+            onAddClicked(nameTextFieldValue, descriptionTextFieldValue, imageUrlTextFieldValue)
+            nameTextFieldValue = ""
+            descriptionTextFieldValue = ""
+            imageUrlTextFieldValue = ""
+        }) {
+            Text("Добавить товар")
+        }
+
+        LazyColumn(
+            modifier = Modifier.padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(state.items) { item ->
+                GoodsCard(
+                    item, 
+                    onGoodClicked,
+                    onDeleteClicked = { 
+                        if (item.id != null) {
+                            onDeleteGood(item.id)
+                        }
+                    }
+                )
+            }
         }
     }
 }
 
 @Composable
 @Preview
-private fun GoodsCardPreview() {
-    GoodsCard(
-        goodsItem = GoodsItem(
-            name = "Курс по Kotlin",
-            rating = 4,
-            description = "test description",
-            imageURL = ""
-        ),
-        onGoodClicked = {}
-    )
+private fun GoodsScreenPreview() {
+    GoodsScreenContent(GoodsUiState(), { _, _, _ -> }, { _ -> }, { _ -> })
 }
-
