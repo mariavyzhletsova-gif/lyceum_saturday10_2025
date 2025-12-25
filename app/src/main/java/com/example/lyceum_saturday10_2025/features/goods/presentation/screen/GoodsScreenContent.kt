@@ -33,12 +33,8 @@ fun GoodsScreenContent(
         var nameTextFieldValue by remember { mutableStateOf("") }
         OutlinedTextField(
             value = nameTextFieldValue,
-            onValueChange = { newValue ->
-                nameTextFieldValue = newValue
-            },
-            placeholder = {
-                Text("Введите название")
-            }
+            onValueChange = { nameTextFieldValue = it },
+            placeholder = { Text("Введите название") }
         )
 
         Spacer(Modifier.height(16.dp))
@@ -46,12 +42,8 @@ fun GoodsScreenContent(
         var descriptionTextFieldValue by remember { mutableStateOf("") }
         OutlinedTextField(
             value = descriptionTextFieldValue,
-            onValueChange = { newValue ->
-                descriptionTextFieldValue = newValue
-            },
-            placeholder = {
-                Text("Введите описание")
-            }
+            onValueChange = { descriptionTextFieldValue = it },
+            placeholder = { Text("Введите описание") }
         )
 
         Spacer(Modifier.height(16.dp))
@@ -59,12 +51,8 @@ fun GoodsScreenContent(
         var imageUrlTextFieldValue by remember { mutableStateOf("") }
         OutlinedTextField(
             value = imageUrlTextFieldValue,
-            onValueChange = { newValue ->
-                imageUrlTextFieldValue = newValue
-            },
-            placeholder = {
-                Text("URL картинки")
-            }
+            onValueChange = { imageUrlTextFieldValue = it },
+            placeholder = { Text("URL картинки") }
         )
 
         Spacer(Modifier.height(16.dp))
@@ -84,9 +72,9 @@ fun GoodsScreenContent(
         ) {
             items(state.items) { item ->
                 GoodsCard(
-                    item, 
+                    item,
                     onGoodClicked,
-                    onDeleteClicked = { 
+                    onDeleteClicked = {
                         if (item.id != null) {
                             onDeleteGood(item.id)
                         }
