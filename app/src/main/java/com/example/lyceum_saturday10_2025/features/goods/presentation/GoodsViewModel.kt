@@ -23,20 +23,20 @@ class GoodsViewModel : ViewModel() {
     }
 
     private fun loadGoodsFromDatabase() {
-        val goodsFromDb = db
-            ?.goodsDao()
-            ?.getAllGoods()
-            ?.map { good ->
-                GoodsItem(
-                    id = good.id,
-                    name = good.name,
-                    rating = good.rating,
-                    description = good.description,
-                    imageURL = good.imageUrl
-                )
-            } ?: emptyList()
-
         viewModelScope.launch {
+            val goodsFromDb = db
+                ?.goodsDao()
+                ?.getAllGoods()
+                ?.map { good ->
+                    GoodsItem(
+                        id = good.id.toLong(),
+                        name = good.name,
+                        rating = good.rating,
+                        description = good.description,
+                        imageURL = "" // Без imageUrl из базы
+                    )
+                } ?: emptyList()
+
             _state.value = GoodsUiState(
                 mockList + goodsFromDb
             )
@@ -44,49 +44,54 @@ class GoodsViewModel : ViewModel() {
     }
 
     fun addGood(name: String, description: String, imageUrl: String = "") {
-        val goodsList = state.value.items.toMutableList()
-        goodsList.add(
-            GoodsItem(
-                name = name,
-                rating = 5,
-                description = description,
-                imageURL = imageUrl
+        viewModelScope.launch {
+            val goodsList = state.value.items.toMutableList()
+            goodsList.add(
+                GoodsItem(
+                    name = name,
+                    rating = 5,
+                    description = description,
+                    imageURL = imageUrl
+                )
             )
-        )
-        db?.goodsDao()?.insert(
-            Good(
-                name = name,
-                description = description,
-                rating = 5,
-                imageUrl = imageUrl
+            db?.goodsDao()?.insert(
+                Good(
+                    name = name,
+                    description = description,
+                    rating = 5
+                    // Без imageUrl в базе
+                )
             )
-        )
-        _state.value = GoodsUiState(goodsList)
+            _state.value = GoodsUiState(goodsList)
+        }
     }
 
     fun deleteGood(goodId: Long) {
-        db?.goodsDao()?.deleteById(goodId)
-        
-        val goodsList = state.value.items.filterNot { it.id == goodId }
-        _state.value = GoodsUiState(goodsList)
+        viewModelScope.launch {
+            // Просто удаляем из списка в UI
+            val goodsList = state.value.items.filterNot { it.id == goodId }
+            _state.value = GoodsUiState(goodsList)
+        }
     }
 
     companion object {
-
         val mockList = listOf(
             GoodsItem(
+                id = 1L,
                 name = "Курс по Kotlin",
                 rating = 4,
                 description = "test description",
                 imageURL = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSibbxABu10t0qxQWHjH-QQFSWaCgd68RbztA&s"
             ),
             GoodsItem(
+                id = 2L,
                 name = "Курс по Java",
                 rating = 5,
                 description = "test description2",
                 imageURL = "https://1000logos.net/wp-content/uploads/2020/09/Java-Logo.jpg"
             ),
             GoodsItem(
+                id = 3L,
                 name = "Курс по Python",
                 rating = 2,
                 description = "test description3",
