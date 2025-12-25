@@ -22,7 +22,6 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.lyceum_saturday10_2025.features.goods.presentation.model.GoodsItem
 
-
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun GoodsCard(
@@ -31,9 +30,7 @@ fun GoodsCard(
     onDeleteClicked: (() -> Unit)? = null,
 ) {
     Card(
-        onClick = {
-            onGoodClicked(goodsItem)
-        }
+        onClick = { onGoodClicked(goodsItem) }
     ) {
         Column {
             GlideImage(
@@ -51,9 +48,7 @@ fun GoodsCard(
                 Spacer(Modifier.weight(1f))
 
                 if (onDeleteClicked != null) {
-                    IconButton(
-                        onClick = onDeleteClicked
-                    ) {
+                    IconButton(onClick = onDeleteClicked) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = null,
